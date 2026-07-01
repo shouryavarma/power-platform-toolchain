@@ -26,10 +26,13 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, question, Task
 | "scan power pages" / "audit permissions" | `skill("scan-site")` / `skill("audit-permissions")` |
 | "create code app" / "code-first" | `skill("create-code-app")` |
 | "generate MCP widget" / "tool visual" | `skill("generate-mcp-app-ui")` |
-| "list solutions" / "export solution" | `pac-cli` → `pac solution list/export/import` |
-| "manage environments" | `pac-cli` → `pac env *` |
-| "login to environment" | `pac-cli` → `pac auth create` |
-| "list/query data" | `pac data *` or `dataverse-mcp` (if configured) |
+| "list solutions" | `pac-cli` → `pac solution list` |
+| "export solution" | `pac-cli` → `pac solution export --name <name>` |
+| "import solution" | `pac-cli` → `pac solution import --file <path>` |
+| "clone solution" | `pac-cli` → `pac solution clone --name <name>` |
+| "manage environments" / "what env" | `pac-cli` → `pac env who` / `pac env list` |
+| "login to environment" | `pac-cli` → `pac auth create --url <url>` |
+| "list/query data" / "show records" | `pac-cli` → `pac data list --table <name>` |
 | "show Power Automate flows" | `powerautomate-mcp` (prompts for key) |
 | "send email" / "calendar" | `microsoft-365-mcp` (device auth flow) |
 | "Power BI model" / "DAX" | `powerbi-modeling-mcp` |

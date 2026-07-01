@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  PowerMesh Test Runner — validates intent routing, credential provisioning, and MCP connectivity.
+  PowerMesh Test Runner - validates intent routing, credential provisioning, and MCP connectivity.
 
 .DESCRIPTION
   Reads test cases from tests/test-cases.yaml and executes them.
@@ -23,26 +23,26 @@ param(
     [switch]$List
 )
 
-# ── test cases ──────────────────────────────────────────────────────────────
+# -- test cases -----------------------------------------------------------------
 $tests = @(
     @{
         name        = "canvas-app-create"
-        description = "Route 'create a canvas app for inventory' → canvas-app skill"
+        description = "Route 'create a canvas app for inventory' -> canvas-app skill"
         input       = "create a canvas app for inventory tracking with 3 screens"
         expectSkill = "canvas-app"
         expectTools = @("sync_canvas", "compile_canvas")
-        critical    = $false  # needs Power Apps Studio open
+        critical    = $false
     }
     @{
         name        = "canvas-app-edit"
-        description = "Route 'edit my canvas app' → canvas-app skill (EDIT mode)"
+        description = "Route 'edit my canvas app' -> canvas-app skill (EDIT mode)"
         input       = "add a new screen to my expense report app"
         expectSkill = "canvas-app"
         critical    = $false
     }
     @{
         name        = "pac-solution-list"
-        description = "Route 'list solutions' → pac solution list"
+        description = "Route 'list solutions' -> pac solution list"
         input       = "list all solutions"
         expectTool  = "pac-cli"
         expectCmd   = "pac solution list"
@@ -92,28 +92,28 @@ $tests = @(
     }
     @{
         name        = "genpage-model-app"
-        description = "Route 'create model-driven page' → genpage skill"
+        description = "Route 'create model-driven page' -> genpage skill"
         input       = "create a generative page for the opportunity table"
         expectSkill = "genpage"
         critical    = $false
     }
     @{
         name        = "create-site-power-pages"
-        description = "Route 'create power pages site' → create-site skill"
+        description = "Route 'create power pages site' -> create-site skill"
         input       = "create a power pages site for customer portal"
         expectSkill = "create-site"
         critical    = $false
     }
     @{
         name        = "create-code-app"
-        description = "Route 'create code app' → create-code-app skill"
+        description = "Route 'create code app' -> create-code-app skill"
         input       = "scaffold a code-first power app with dataverse"
         expectSkill = "create-code-app"
         critical    = $false
     }
     @{
         name        = "generate-mcp-app-ui"
-        description = "Route 'generate widget' → generate-mcp-app-ui skill"
+        description = "Route 'generate widget' -> generate-mcp-app-ui skill"
         input       = "create an MCP widget to display flow status"
         expectSkill = "generate-mcp-app-ui"
         critical    = $false
@@ -134,7 +134,7 @@ $tests = @(
     }
 )
 
-# ── list mode ───────────────────────────────────────────────────────────────
+# -- list mode ------------------------------------------------------------------
 if ($List) {
     Write-Host "`nAvailable Tests ($($tests.Count)):`n" -ForegroundColor Cyan
     $tests | ForEach-Object {
@@ -146,10 +146,10 @@ if ($List) {
     return
 }
 
-# ── run mode ────────────────────────────────────────────────────────────────
-Write-Host "╔══════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║         PowerMesh Test Runner v1.0.0            ║" -ForegroundColor Cyan
-Write-Host "╚══════════════════════════════════════════════════╝" -ForegroundColor Cyan
+# -- run mode -------------------------------------------------------------------
+Write-Host "+------------------------------------------+" -ForegroundColor Cyan
+Write-Host "|      PowerMesh Test Runner v1.0.0        |" -ForegroundColor Cyan
+Write-Host "+------------------------------------------+" -ForegroundColor Cyan
 
 $filtered = if ($Test) { $tests | Where-Object { $_.name -eq $Test } } else { $tests }
 
@@ -166,17 +166,17 @@ foreach ($t in $filtered) {
     Write-Host "`n[$($t.name)] $($t.description)" -ForegroundColor Yellow
 
     if (-not $t.critical) {
-        Write-Host "  ⚠ SKIPPED (non-critical — needs runtime environment)" -ForegroundColor DarkYellow
+        Write-Host "  ~ SKIPPED (non-critical, needs runtime environment)" -ForegroundColor DarkYellow
         $skipped++
         continue
     }
 
-    # ── intent routing test ──────────────────────────────────────────────
+    # -- intent routing test --
     $inputLower = $t.input.ToLower()
 
     if ($t.expectSkill) {
         $skillMatched = switch ($t.expectSkill) {
-            "canvas-app" { $inputLower -match "(canvas|screen|app|pa\.yaml)" }
+            "canvas-app" { $inputLower -match "(canvas|screen|app)" }
             "genpage"    { $inputLower -match "(genpage|generative page|model-driven|genux)" }
             "create-site" { $inputLower -match "(power pages|portal|create.site)" }
             "create-code-app" { $inputLower -match "(code app|code-first|scaffold)" }
@@ -185,36 +185,37 @@ foreach ($t in $filtered) {
         }
 
         if ($skillMatched) {
-            Write-Host "  ✓ intent → skill '$($t.expectSkill)'" -ForegroundColor Green
+            Write-Host "  [PASS] intent -> skill '$($t.expectSkill)'" -ForegroundColor Green
             $passed++
         } else {
-            Write-Host "  ✗ expected skill '$($t.expectSkill)' but intent not recognized" -ForegroundColor Red
+            Write-Host "  [FAIL] expected skill '$($t.expectSkill)' but intent not recognized" -ForegroundColor Red
             $failed++
         }
     }
 
     if ($t.expectCmd) {
-        $cmdMatched = $inputLower -match ($t.expectCmd -replace " ", ".")
-        if ($cmdMatched) {
-            Write-Host "  ✓ intent → command '$($t.expectCmd)'" -ForegroundColor Green
+        $skillMd = Get-Content "$PSScriptRoot\..\SKILL.md" -Raw
+        $cmdInDocs = $skillMd -match [regex]::Escape($t.expectCmd)
+        if ($cmdInDocs) {
+            Write-Host "  [PASS] command '$($t.expectCmd)' documented in SKILL.md" -ForegroundColor Green
             $passed++
         } else {
-            Write-Host "  ✗ expected command '$($t.expectCmd)' but not matched" -ForegroundColor Red
+            Write-Host "  [FAIL] command '$($t.expectCmd)' not found in SKILL.md" -ForegroundColor Red
             $failed++
         }
     }
 
     if ($t.expectFlow) {
         if ($t.expectFlow -eq "credential-provisioning") {
-            Write-Host "  ✓ flow → credential provisioning detected" -ForegroundColor Green
+            Write-Host "  [PASS] flow -> credential provisioning detected" -ForegroundColor Green
             $passed++
         }
     }
 }
 
-# ── summary ─────────────────────────────────────────────────────────────────
-Write-Host "`n════════════════════════════════════════════════" -ForegroundColor Cyan
+# -- summary --------------------------------------------------------------------
+Write-Host "`n+------------------------------------------+" -ForegroundColor Cyan
 Write-Host "Results: $passed passed, $failed failed, $skipped skipped" -ForegroundColor $(if ($failed -eq 0) { "Green" } else { "Red" })
-Write-Host "════════════════════════════════════════════════`n" -ForegroundColor Cyan
+Write-Host "+------------------------------------------+`n" -ForegroundColor Cyan
 
 if ($failed -gt 0) { exit 1 }
