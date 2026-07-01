@@ -53,7 +53,7 @@ powershell -c "iex (irm https://raw.githubusercontent.com/shouryavarma/power-pla
 
 ## What is PowerMesh?
 
-PowerMesh is a natural language interface for the Microsoft Power Platform ecosystem. It connects Claude Code to 7 MCP servers and 4 plugin sub-skills, giving you one conversational interface for:
+PowerMesh is a natural language interface for the Microsoft Power Platform ecosystem. It connects Claude Code to 7 MCP servers and 5 plugin sub-skills, giving you one conversational interface for:
 
 - **Canvas Apps** — create, edit, compile, sync via Canvas Authoring MCP
 - **Model-Driven Apps** — pages, forms, views via genpage skill
@@ -143,6 +143,9 @@ Then try these commands:
 | "show my Power Automate flows" | Prompts for Flow Studio API key → lists flows |
 | "send an email to the team" | Prompts for device auth → sends via Microsoft Graph |
 | "list records from the Account table" | `pac data list --table Account` |
+| "create a code-first app for task tracking" | Scaffolds React/TS project → builds → deploys to Power Platform |
+| "list my code apps" | `pac canvas list` |
+| "download a code app" | `pac canvas download --name <name>` |
 
 ---
 
@@ -174,6 +177,29 @@ User:  "Clone it for source control"
 
 Agent: → pac solution clone --name Contoso --output src/solutions/
        → Returns the cloned directory path
+```
+
+### Code-First Power App
+
+```
+User:  "Create a code-first app for task tracking"
+
+Agent: "What data source?" → "SharePoint list called Tasks"
+Agent: "What features?" → "View tasks, add new, mark complete"
+
+Agent: → Scaffolds Vite + React + TypeScript project
+       → Installs Power Apps SDK
+       → Creates TaskList, AddTask, TaskDetail components
+       → Connects to SharePoint Tasks list
+       → Builds and deploys to Power Platform
+       → Returns the app URL
+```
+
+```
+User:  "List my code apps"
+
+Agent: → pac canvas list
+       → Returns table of app names, IDs, last modified
 ```
 
 ### On-demand Credential Provisioning
@@ -210,7 +236,7 @@ Agent: → Sets $env:FLOWSTUDIO_API_KEY = "pp-flow-abc123..."
           ▼                ▼   ▼   ▼                ▼
    ┌────────────┐   ┌────────────┐   ┌──────────────────┐
    │  PAC CLI   │   │ Sub-skills │   │  MCP Servers     │
-   │  (zero-env)│   │ (4 skills) │   │  (5 ready/block) │
+    │  (zero-env)│   │ (5 skills) │   │  (5 ready/block) │
    └────────────┘   └────────────┘   └──────────────────┘
           │                │                  │
           ▼                ▼                  ▼
@@ -243,6 +269,7 @@ All sub-skills are auto-installed to `~/.agents/skills/powermesh-*/` and loadabl
 | `powermesh-dataverse` | Dataverse CRUD via PAC CLI + MCP | `skill("powermesh-dataverse")` |
 | `powermesh-pac-cli` | PAC CLI command cheat sheet | `skill("powermesh-pac-cli")` |
 | `powermesh-mcp-bridge` | On-demand credential provisioning | `skill("powermesh-mcp-bridge")` |
+| `powermesh-create-code-app` | Code-first Power Apps (React/TS) | `skill("powermesh-create-code-app")` |
 
 Additionally, the installer copies 7 Microsoft-provided plugin skills to `~/.agents/skills/`:
 

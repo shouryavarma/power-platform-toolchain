@@ -24,7 +24,9 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, question, Task
 | "create power pages site" / "portal" | `skill("create-site")` |
 | "deploy power pages" | `skill("deploy-site")` |
 | "scan power pages" / "audit permissions" | `skill("scan-site")` / `skill("audit-permissions")` |
-| "create code app" / "code-first" | `skill("create-code-app")` |
+| "create code app" / "code-first" | `skill("powermesh-create-code-app")` → delegates to `skill("create-code-app")` |
+| "list code apps" / "my code apps" | `pac-cli` → `pac canvas list` |
+| "download code app" | `pac-cli` → `pac canvas download --name <name>` |
 | "generate MCP widget" / "tool visual" | `skill("generate-mcp-app-ui")` |
 | "list solutions" | `pac-cli` → `pac solution list` |
 | "export solution" | `pac-cli` → `pac solution export --name <name>` |
@@ -70,6 +72,7 @@ Run `skill("powermesh-<name>")` for deeper guidance:
 - `powermesh-dataverse` — Dataverse CRUD via PAC CLI and MCP
 - `powermesh-pac-cli` — PAC CLI command reference
 - `powermesh-mcp-bridge` — On-demand credential provisioning
+- `powermesh-create-code-app` — Code-first Power Apps scaffolding and deployment
 
 ## Testing
 

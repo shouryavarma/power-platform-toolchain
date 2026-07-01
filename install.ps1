@@ -38,6 +38,7 @@ $subSkills = @{
     "powermesh-dataverse"  = "skills\dataverse\SKILL.md"
     "powermesh-pac-cli"    = "skills\pac-cli\SKILL.md"
     "powermesh-mcp-bridge" = "skills\mcp-bridge\SKILL.md"
+    "powermesh-create-code-app" = "skills\create-code-app\SKILL.md"
 }
 
 Write-Host "`n[PowerMesh] Creating directories..." -ForegroundColor Cyan
@@ -71,8 +72,8 @@ foreach ($name in $subSkills.Keys) {
 $testRunner = "$pluginDir\scripts\test-runner.ps1"
 if (Test-Path $testRunner) {
     Write-Host "`n[PowerMesh] Running verification tests..." -ForegroundColor Cyan
-    & $testRunner
-    if ($LASTEXITCODE -eq 0) {
+    & $testRunner; $exitCode = $LASTEXITCODE
+    if ($exitCode -eq 0) {
         Write-Host "`n[PowerMesh] All critical tests PASSED.`n" -ForegroundColor Green
     } else {
         Write-Host "`n[PowerMesh] WARNING: Some tests failed. Check output above.`n" -ForegroundColor Yellow
