@@ -87,21 +87,22 @@ Optional but recommended:
 
 ## Installation
 
-### One-command remote install
+Pick the method that works for you.
 
-Run this from any machine with PowerShell 5.1+:
+### 🖱️ Double-click (Windows)
+
+[Download the repo ZIP](https://github.com/shouryavarma/power-platform-toolchain/archive/refs/heads/main.zip),
+extract the folder, then double-click **`setup.cmd`**.
+
+### 📋 One-command remote install
 
 ```powershell
 powershell -c "iex (irm https://raw.githubusercontent.com/shouryavarma/power-platform-toolchain/main/install.ps1)"
 ```
 
-This will:
-1. Create `~/.claude/plugins/powermesh/` with all plugin files
-2. Register 5 sub-skills in `~/.agents/skills/powermesh*/`
-3. Run the test suite to verify everything works
-4. Print a summary
+Installer creates `~/.claude/plugins/powermesh/`, registers 5 sub-skills, and verifies.
 
-### npm (via GitHub Release)
+### 📦 npm (global CLI)
 
 ```bash
 # Install globally from GitHub Release
