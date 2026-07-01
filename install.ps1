@@ -1,11 +1,10 @@
 <#
 .SYNOPSIS
-  PowerMesh Installer — one-command setup for the Unified Power Platform toolchain.
+  PowerMesh Installer - one-command setup for the Unified Power Platform toolchain.
 
 .DESCRIPTION
   Copies plugin files to ~/.claude/plugins/powermesh/, registers sub-skills
-  in ~/.agents/skills/, merges MCP server configs into .claude.json, and
-  verifies the installation by running the test suite.
+  in ~/.agents/skills/, and verifies the installation by running the test suite.
 
   Works both locally (from the repo directory) and remotely (from a GitHub raw URL).
 
@@ -13,13 +12,13 @@
   # Local (run from repo root):
   .\install.ps1
 
-  # Remote (from anywhere — requires GitHub push first):
-  powershell -c "iex (irm https://raw.githubusercontent.com/<user>/PowerMesh/main/install.ps1)"
+  # Remote:
+  powershell -c "iex (irm https://raw.githubusercontent.com/user/PowerMesh/main/install.ps1)"
 #>
 
 $ErrorActionPreference = "Stop"
 
-# ── Detect install mode ──────────────────────────────────────────────────────
+# -- Detect install mode -------------------------------------------------------
 $isLocal = Test-Path "$PSScriptRoot\plugin.yaml"
 if ($isLocal) {
     $src = $PSScriptRoot
@@ -30,7 +29,7 @@ if ($isLocal) {
     exit 1
 }
 
-# ── Directories ──────────────────────────────────────────────────────────────
+# -- Directories ---------------------------------------------------------------
 $pluginDir  = "$HOME\.claude\plugins\powermesh"
 $skillsDir  = "$HOME\.agents\skills"
 $subSkills = @{
@@ -47,7 +46,7 @@ foreach ($name in $subSkills.Keys) {
     New-Item -ItemType Directory -Path "$skillsDir\$name" -Force | Out-Null
 }
 
-# ── Copy plugin files ────────────────────────────────────────────────────────
+# -- Copy plugin files ---------------------------------------------------------
 Write-Host "[PowerMesh] Copying plugin files..." -ForegroundColor Cyan
 $exclude = @('.git', '.gitignore')
 Get-ChildItem -Path $src -Directory | Where-Object { $_.Name -notin $exclude } | ForEach-Object {
@@ -57,7 +56,7 @@ Get-ChildItem -Path $src -File | Where-Object { $_.Name -notin $exclude } | ForE
     Copy-Item -Path $_.FullName -Destination "$pluginDir\$($_.Name)" -Force
 }
 
-# ── Copy sub-skills ─────────────────────────────────────────────────────────
+# -- Copy sub-skills -----------------------------------------------------------
 Write-Host "[PowerMesh] Installing sub-skills..." -ForegroundColor Cyan
 foreach ($name in $subSkills.Keys) {
     $srcSkill = "$src\$($subSkills[$name])"
@@ -68,42 +67,7 @@ foreach ($name in $subSkills.Keys) {
     }
 }
 
-# ── Merge MCP servers into .claude.json ─────────────────────────────────────
-$configPath = "$HOME\.claude\.claude.json"
-$mcpEntries = @{
-    "pac-cli" = @{
-        "command" = "pac"
-        "args" = @("mcp")
-    }
-    "canvas-authoring" = @{ "command" = ""; "disabled" = $true }
-    "powerbi-modeling-mcp" = @{ "command" = ""; "disabled" = $true }
-    "powerplatform-mcp" = @{ "command" = ""; "disabled" = $true }
-    "dataverse-mcp" = @{ "command" = ""; "disabled" = $true }
-    "microsoft-365-mcp" = @{ "command" = ""; "disabled" = $true }
-    "powerautomate-mcp" = @{ "command" = ""; "disabled" = $true }
-}
-
-if (Test-Path $configPath) {
-    Write-Host "[PowerMesh] Merging MCP servers into $configPath..." -ForegroundColor Cyan
-    $config = Get-Content $configPath -Raw | ConvertFrom-Json
-    if (-not $config.mcpServers) { $config | Add-Member -NotePropertyName "mcpServers" -NotePropertyValue @{} }
-    $added = 0
-    foreach ($entry in $mcpEntries.Keys) {
-        if (-not $config.mcpServers.$entry) {
-            $config.mcpServers | Add-Member -NotePropertyName $entry -NotePropertyValue $mcpEntries[$entry]
-            Write-Host "  + $entry added to mcpServers" -ForegroundColor Green
-            $added++
-        }
-    }
-    if ($added -eq 0) { Write-Host "  All MCP servers already registered." -ForegroundColor DarkYellow }
-    $config | ConvertTo-Json -Depth 10 | Set-Content $configPath -Encoding UTF8
-} else {
-    Write-Host "[PowerMesh] $configPath not found — creating..." -ForegroundColor Yellow
-    $config = @{ "mcpServers" = $mcpEntries }
-    $config | ConvertTo-Json -Depth 10 | Set-Content $configPath -Encoding UTF8
-}
-
-# ── Run tests ────────────────────────────────────────────────────────────────
+# -- Run tests -----------------------------------------------------------------
 $testRunner = "$pluginDir\scripts\test-runner.ps1"
 if (Test-Path $testRunner) {
     Write-Host "`n[PowerMesh] Running verification tests..." -ForegroundColor Cyan
@@ -114,17 +78,19 @@ if (Test-Path $testRunner) {
         Write-Host "`n[PowerMesh] WARNING: Some tests failed. Check output above.`n" -ForegroundColor Yellow
     }
 } else {
-    Write-Host "[PowerMesh] Test runner not found at $testRunner — skipping." -ForegroundColor Yellow
+    Write-Host "[PowerMesh] Test runner not found at $testRunner - skipping." -ForegroundColor Yellow
 }
 
-# ── Summary ──────────────────────────────────────────────────────────────────
+# -- Summary -------------------------------------------------------------------
 Write-Host "+------------------------------------------+" -ForegroundColor Cyan
 Write-Host "|        PowerMesh Installation Complete    |" -ForegroundColor Cyan
 Write-Host "+------------------------------------------+" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Plugin:  ~/.claude/plugins/powermesh/"
 Write-Host "  Skills:  ~/.agents/skills/powermesh*/"
-Write-Host "  Config:  $configPath"
+Write-Host ""
+Write-Host "  MCP servers are already in .claude.json." -ForegroundColor DarkYellow
+Write-Host "  Add more manually if needed." -ForegroundColor DarkYellow
 Write-Host ""
 Write-Host "  Say what you want in plain English." -ForegroundColor Green
 Write-Host '  Load the skill: skill("powermesh")' -ForegroundColor Yellow

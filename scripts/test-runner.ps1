@@ -218,4 +218,4 @@ Write-Host "`n+------------------------------------------+" -ForegroundColor Cya
 Write-Host "Results: $passed passed, $failed failed, $skipped skipped" -ForegroundColor $(if ($failed -eq 0) { "Green" } else { "Red" })
 Write-Host "+------------------------------------------+`n" -ForegroundColor Cyan
 
-if ($failed -gt 0) { exit 1 }
+if ($failed -gt 0) { exit 1 } else { exit 0 }
