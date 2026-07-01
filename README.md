@@ -1,13 +1,31 @@
-# PowerMesh — Unified Power Platform Toolchain
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/logo.svg">
+  <img src="assets/logo.svg" alt="PowerMesh — Unified Power Platform Toolchain" width="100%">
+</picture>
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)]()
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-8/8%20critical%20PASS-brightgreen.svg)]()
-[![PowerShell](https://img.shields.io/badge/powershell-5.1%2B-blue.svg)]()
-[![PAC CLI](https://img.shields.io/badge/PAC%20CLI-ready-brightgreen.svg)]()
-[![PRs](https://img.shields.io/badge/PRs-welcome-orange.svg)](CONTRIBUTING.md)
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square" alt="Version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License"></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-8%2F8%20PASS-brightgreen?style=flat-square" alt="Tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/powershell-5.1%2B-blue?style=flat-square" alt="PowerShell"></a>
+  <a href="#"><img src="https://img.shields.io/badge/PAC%20CLI-ready-brightgreen?style=flat-square" alt="PAC CLI"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-orange?style=flat-square" alt="PRs Welcome"></a>
+</p>
 
-**Say what you want in plain English. PowerMesh routes your intent to the right Power Platform tool — MCP server, PAC CLI command, or plugin skill — automatically.**
+<p align="center">
+  <b>Say what you want in plain English.</b>
+  PowerMesh routes your intent to the right Power Platform tool — MCP server, PAC CLI command, or plugin skill — automatically.
+</p>
+
+<p align="center">
+  <a href="#installation"><kbd>⏬ Install</kbd></a>
+  &nbsp;
+  <a href="#quick-start"><kbd>🚀 Quick Start</kbd></a>
+  &nbsp;
+  <a href="#usage-examples"><kbd>📋 Examples</kbd></a>
+  &nbsp;
+  <a href="docs/ARCHITECTURE.md"><kbd>🏗️ Architecture</kbd></a>
+</p>
 
 ```powershell
 powershell -c "iex (irm https://raw.githubusercontent.com/shouryavarma/power-platform-toolchain/main/install.ps1)"

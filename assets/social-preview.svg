@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D1117"/>
+      <stop offset="100%" style="stop-color:#161B22"/>
+    </linearGradient>
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4"/>
+      <stop offset="100%" style="stop-color:#5C2D91"/>
+    </linearGradient>
+    <linearGradient id="meshGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0078D4;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#5C2D91;stop-opacity:0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1280" height="640" fill="url(#bgGrad)"/>
+
+  <!-- Hex mesh background -->
+  <g transform="translate(640, 320)" stroke="url(#meshGrad)" stroke-width="2" fill="none">
+    <polygon points="0,-200 173,-100 173,100 0,200 -173,100 -173,-100" />
+    <polygon points="0,-260 225,-130 225,130 0,260 -225,130 -225,-130" />
+    <polygon points="0,-320 277,-160 277,160 0,320 -277,160 -277,-160" />
+  </g>
+
+  <!-- Bolt -->
+  <g transform="translate(480, 240)">
+    <path d="M80 10 L20 150 L60 150 L40 230 L140 80 L90 80 L120 10 Z"
+          fill="url(#boltGrad)" opacity="0.15"/>
+  </g>
+
+  <!-- Title -->
+  <text x="640" y="260" font-family="Segoe UI, Arial, sans-serif" font-size="80" font-weight="700" fill="#E6EDF3" text-anchor="middle" letter-spacing="-1">Power<span style="fill:#0078D4">Mesh</span></text>
+
+  <!-- Subtitle -->
+  <text x="640" y="320" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#8B949E" text-anchor="middle" letter-spacing="3">UNIFIED POWER PLATFORM TOOLCHAIN</text>
+
+  <!-- Tagline -->
+  <text x="640" y="390" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#E6EDF3" text-anchor="middle" opacity="0.7">Say what you want. PowerMesh routes to the right tool. Automatically.</text>
+
+  <!-- Badge row -->
+  <g transform="translate(640, 460)">
+    <rect x="-200" y="-18" width="180" height="36" rx="6" fill="#21262D" stroke="#30363D" stroke-width="1"/>
+    <text x="-110" y="6" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#8B949E" text-anchor="middle">pac CLI (ready)</text>
+
+    <rect x="20" y="-18" width="180" height="36" rx="6" fill="#21262D" stroke="#30363D" stroke-width="1"/>
+    <text x="110" y="6" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#8B949E" text-anchor="middle">7 MCP servers</text>
+  </g>
+
+  <!-- Devices -->
+  <text x="640" y="540" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#30363D" text-anchor="middle">Canvas Apps · Power Pages · Dataverse · Power Automate · Power BI · M365</text>
+</svg>

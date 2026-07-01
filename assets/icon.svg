@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D1117"/>
+      <stop offset="100%" style="stop-color:#161B22"/>
+    </linearGradient>
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4"/>
+      <stop offset="100%" style="stop-color:#5C2D91"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#5C2D91;stop-opacity:0.25"/>
+    </linearGradient>
+    <linearGradient id="nodeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0078D4"/>
+      <stop offset="100%" style="stop-color:#106EBE"/>
+    </linearGradient>
+    <linearGradient id="nodeGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5C2D91"/>
+      <stop offset="100%" style="stop-color:#8661C5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
+  <circle cx="100" cy="100" r="96" fill="none" stroke="url(#ringGrad)" stroke-width="2"/>
+
+  <!-- Outer hexagon mesh ring -->
+  <g transform="translate(100, 100)" stroke="url(#ringGrad)" stroke-width="2" fill="none">
+    <polygon points="0,-55 48,-27 48,27 0,55 -48,27 -48,-27" />
+    <polygon points="0,-68 59,-34 59,34 0,68 -59,34 -59,-34" />
+  </g>
+
+  <!-- Mesh lines (hexagon connections) -->
+  <g stroke="url(#ringGrad)" stroke-width="1" fill="none">
+    <line x1="52" y1="73" x2="80" y2="60"/>
+    <line x1="80" y1="60" x2="100" y2="45"/>
+    <line x1="148" y1="73" x2="120" y2="60"/>
+    <line x1="120" y1="60" x2="100" y2="45"/>
+    <line x1="52" y1="127" x2="80" y2="140"/>
+    <line x1="148" y1="127" x2="120" y2="140"/>
+    <line x1="80" y1="140" x2="100" y2="155"/>
+    <line x1="120" y1="140" x2="100" y2="155"/>
+    <line x1="52" y1="73" x2="52" y2="127"/>
+    <line x1="148" y1="73" x2="148" y2="127"/>
+  </g>
+
+  <!-- Mesh nodes -->
+  <circle cx="100" cy="45" r="4.5" fill="url(#nodeGrad1)"/>
+  <circle cx="80" cy="60" r="3.5" fill="url(#nodeGrad2)"/>
+  <circle cx="120" cy="60" r="3.5" fill="url(#nodeGrad1)"/>
+  <circle cx="52" cy="73" r="3" fill="url(#nodeGrad2)"/>
+  <circle cx="148" cy="73" r="3" fill="url(#nodeGrad1)"/>
+  <circle cx="52" cy="127" r="3" fill="url(#nodeGrad2)"/>
+  <circle cx="148" cy="127" r="3" fill="url(#nodeGrad1)"/>
+  <circle cx="80" cy="140" r="3.5" fill="url(#nodeGrad2)"/>
+  <circle cx="120" cy="140" r="3.5" fill="url(#nodeGrad1)"/>
+  <circle cx="100" cy="155" r="4.5" fill="url(#nodeGrad1)"/>
+
+  <!-- Bolt icon (center) -->
+  <g transform="translate(78, 82)">
+    <path d="M14 2 L4 28 L12 28 L8 42 L22 16 L14 16 L18 2 Z"
+          fill="url(#boltGrad)"/>
+  </g>
+
+  <!-- Text -->
+  <text x="100" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#E6EDF3" text-anchor="middle" letter-spacing="1">PowerMesh</text>
+</svg>
