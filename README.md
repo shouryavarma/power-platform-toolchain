@@ -1,121 +1,369 @@
 # PowerMesh — Unified Power Platform Toolchain
 
-Natural language interface for all Microsoft Power Platform tools. Say what you want in plain English; PowerMesh routes to the right MCP server, plugin skill, or agent automatically.
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)]()
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-8/8%20critical%20PASS-brightgreen.svg)]()
+[![PowerShell](https://img.shields.io/badge/powershell-5.1%2B-blue.svg)]()
+[![PAC CLI](https://img.shields.io/badge/PAC%20CLI-ready-brightgreen.svg)]()
+[![PRs](https://img.shields.io/badge/PRs-welcome-orange.svg)](CONTRIBUTING.md)
 
-## Architecture
+**Say what you want in plain English. PowerMesh routes your intent to the right Power Platform tool — MCP server, PAC CLI command, or plugin skill — automatically.**
 
-```
-User prompt (plain English)
-    │
-    ▼
-┌────────────────────────────────────────────────┐
-│           PowerMesh Intent Router              │
-│  (powermesh SKILL.md routing table)            │
-└──────┬──────┬──────┬──────┬──────┬─────────────┘
-       │      │      │      │      │
-       ▼      ▼      ▼      ▼      ▼
-   ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌──────────┐
-   │PAC  │ │Canv.│ │Data-│ │M365 │ │Power     │
-   │CLI  │ │Auth │ │verse│ │Graph│ │Automate  │
-   │MCP  │ │MCP  │ │MCP  │ │MCP  │ │MCP       │
-   └─────┘ └─────┘ └─────┘ └─────┘ └──────────┘
-   (ready) (ready) (blocked)(blocked)(blocked)
+```powershell
+powershell -c "iex (irm https://raw.githubusercontent.com/shouryavarma/power-platform-toolchain/main/install.ps1)"
 ```
 
-- **Ready** servers work immediately (no env vars needed)
-- **Blocked** servers prompt for credentials on first use, then work for the session
+---
+
+## Table of Contents
+
+- [What is PowerMesh?](#what-is-powermesh)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage Examples](#usage-examples)
+- [Architecture](#architecture)
+- [Sub-skills](#sub-skills)
+- [MCP Servers](#mcp-servers)
+- [Credential Provisioning](#credential-provisioning)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## What is PowerMesh?
+
+PowerMesh is a natural language interface for the Microsoft Power Platform ecosystem. It connects Claude Code to 7 MCP servers and 4 plugin sub-skills, giving you one conversational interface for:
+
+- **Canvas Apps** — create, edit, compile, sync via Canvas Authoring MCP
+- **Model-Driven Apps** — pages, forms, views via genpage skill
+- **Power Pages** — sites, pages, deployment via create-site skill
+- **Dataverse** — CRUD, schema, tables via PAC CLI or dataverse-mcp
+- **PAC CLI** — 25+ command groups, zero setup required
+- **Power Automate** — flow management via Flow Studio MCP
+- **Power BI** — modeling and DAX via powerbi-modeling-mcp
+- **Microsoft 365** — email, calendar, Graph via microsoft-365-mcp
+
+**Key design principle:** Zero upfront configuration. Servers that need credentials prompt you on first use — you provide them once per session, never stored to disk.
+
+---
+
+## Prerequisites
+
+| Requirement | Version | Why |
+|------------|---------|-----|
+| [Claude Code](https://claude.ai) | Latest | AI agent that runs PowerMesh skills |
+| [PowerShell](https://learn.microsoft.com/en-us/powershell/) | 5.1+ | Installer and test runner |
+| [PAC CLI](https://learn.microsoft.com/en-us/power-platform/developer/cli/introduction) | Latest | Power Platform command-line (install via `dotnet tool install --global Microsoft.PowerApps.CLI.Tool`) |
+| [Node.js](https://nodejs.org/) | 18+ | Canvas Authoring MCP and MCP server runtime |
+| [git](https://git-scm.com/) | Any | For development and cloning |
+
+Optional but recommended:
+- A Power Apps Studio browser tab (for Canvas Authoring MCP sync)
+- A [Flow Studio](https://mcp.flowstudio.app) API key (for Power Automate)
+- Azure AD app registration (for powerplatform-mcp and dataverse-mcp)
+
+---
+
+## Installation
+
+### One-command remote install
+
+Run this from any machine with PowerShell 5.1+:
+
+```powershell
+powershell -c "iex (irm https://raw.githubusercontent.com/shouryavarma/power-platform-toolchain/main/install.ps1)"
+```
+
+This will:
+1. Create `~/.claude/plugins/powermesh/` with all plugin files
+2. Register 5 sub-skills in `~/.agents/skills/powermesh*/`
+3. Run the test suite to verify everything works
+4. Print a summary
+
+### Manual install
+
+```powershell
+# Clone the repo
+git clone https://github.com/shouryavarma/power-platform-toolchain.git
+cd power-platform-toolchain
+
+# Run the installer
+.\install.ps1
+```
+
+### Verify installation
+
+```powershell
+# Run the test suite
+./scripts/test-runner.ps1
+
+# Expected output: "Results: 8 passed, 0 failed, 7 skipped"
+```
+
+---
 
 ## Quick Start
 
-### 1. Install the plugin
-
-Copy the `powermesh` directory to your `~/.claude/plugins/powermesh/` or reference it from your project's `.claude.json`.
-
-### 2. Load the skill
+Once installed, load the skill and start speaking naturally:
 
 ```
 > skill("powermesh")
 ```
 
-This makes all sub-skills and routing tables available.
-
-### 3. Speak naturally
+Then try these commands:
 
 | You say | PowerMesh does |
 |---------|---------------|
-| "Create a canvas app for inventory tracking" | Loads canvas-app skill → plans screens → writes `.pa.yaml` → compiles → syncs |
-| "List all solutions" | `pac solution list` via PAC CLI MCP |
-| "Export the Contoso solution" | `pac solution export --name Contoso` |
-| "Add a Dataverse table for Customers" | Falls back to `pac data create` or prompts for dataverse-mcp credentials |
-| "Show my Power Automate flows" | Prompts for Flow Studio API key → lists flows |
-| "What's my current environment?" | `pac env who` |
+| "list solutions" | `pac solution list` — no setup needed |
+| "what's my current environment" | `pac env who` |
+| "export the Contoso solution" | `pac solution export --name Contoso --managed` |
+| "create a canvas app for inventory tracking" | Loads canvas-app skill → plans screens → writes `.pa.yaml` → compiles → syncs to Studio |
+| "add a Dataverse table for Customers" | `pac data create` or prompts for dataverse-mcp credentials |
+| "show my Power Automate flows" | Prompts for Flow Studio API key → lists flows |
+| "send an email to the team" | Prompts for device auth → sends via Microsoft Graph |
+| "list records from the Account table" | `pac data list --table Account` |
+
+---
+
+## Usage Examples
+
+### Canvas App Creation
+
+```
+User:  "Create a canvas app for expense reporting"
+
+Agent: "What screens do you need?"
+User:  "Submit Expense, Pending Approvals, History"
+
+Agent: → Writes 3 `.pa.yaml` files
+       → Runs `compile_canvas` to validate
+       → Runs `sync_canvas` to push to Studio
+       → Returns the Studio session URL
+```
+
+### Solution Lifecycle
+
+```
+User:  "Export the Contoso solution"
+
+Agent: → pac solution export --name Contoso --managed
+       → Returns the exported .zip path
+
+User:  "Clone it for source control"
+
+Agent: → pac solution clone --name Contoso --output src/solutions/
+       → Returns the cloned directory path
+```
+
+### On-demand Credential Provisioning
+
+```
+User:  "Show my Power Automate flows"
+
+Agent: → Calls powerautomate-mcp → error: "FLOWSTUDIO_API_KEY not set"
+       → "I need your Flow Studio API key. Get one at https://mcp.flowstudio.app"
+User:  "My key is pp-flow-abc123..."
+
+Agent: → Sets $env:FLOWSTUDIO_API_KEY = "pp-flow-abc123..."
+       → Calls powerautomate-mcp → success
+       → Returns the list of flows
+```
+
+---
+
+## Architecture
+
+```
+                    ┌───────────────────────┐
+                    │    Your Prompt         │
+                    │  (plain English)       │
+                    └──────────┬────────────┘
+                               │
+                               ▼
+                    ┌───────────────────────┐
+                    │  PowerMesh Intent     │
+                    │  Router (SKILL.md)    │
+                    └──┬───┬───┬───┬───┬───┘
+                       │   │   │   │   │
+          ┌────────────┘   │   │   │   └────────────┐
+          ▼                ▼   ▼   ▼                ▼
+   ┌────────────┐   ┌────────────┐   ┌──────────────────┐
+   │  PAC CLI   │   │ Sub-skills │   │  MCP Servers     │
+   │  (zero-env)│   │ (4 skills) │   │  (5 ready/block) │
+   └────────────┘   └────────────┘   └──────────────────┘
+          │                │                  │
+          ▼                ▼                  ▼
+   ┌────────────┐   ┌────────────┐   ┌──────────────────┐
+   │ pac auth   │   │ Canvas App │   │ powerplatform-mcp│
+   │ pac soln   │   │ Dataverse  │   │ dataverse-mcp    │
+   │ pac env    │   │ PAC CLI    │   │ m365-mcp         │
+   │ pac data   │   │ MCP Bridge │   │ flowstudio-mcp   │
+   └────────────┘   └────────────┘   └──────────────────┘
+```
+
+**Three routing layers:**
+
+1. **PAC CLI** (Layer 1) — Zero-setup workhorse. 25+ command groups for auth, solutions, data, environments, plugins, connectors. Always available.
+
+2. **Sub-skills** (Layer 2) — Domain-specific agents that handle complex workflows (canvas app creation, Dataverse CRUD, credential provisioning).
+
+3. **MCP Servers** (Layer 3) — Specialized servers for deep Power Platform integration. Some ready immediately (pac-cli MCP, canvas-authoring MCP), others prompt for credentials on first use.
+
+---
 
 ## Sub-skills
 
-| Skill | Purpose | Load via |
-|-------|---------|----------|
-| `powermesh-canvas-app` | Canvas App create/edit | `skill("powermesh-canvas-app")` |
-| `powermesh-dataverse` | Dataverse CRUD + metadata | `skill("powermesh-dataverse")` |
-| `powermesh-pac-cli` | PAC CLI cheat sheet | `skill("powermesh-pac-cli")` |
-| `powermesh-mcp-bridge` | Credential provisioning | `skill("powermesh-mcp-bridge")` |
-| `canvas-app` (Microsoft) | Official canvas app skill | `skill("canvas-app")` |
-| `genpage` (Microsoft) | Model-driven app pages | `skill("genpage")` |
-| `create-site` (Microsoft) | Power Pages sites | `skill("create-site")` |
-| `create-code-app` (Microsoft) | Code-first Power Apps | `skill("create-code-app")` |
+All sub-skills are auto-installed to `~/.agents/skills/powermesh-*/` and loadable by name.
+
+| Skill | Purpose | Load command |
+|-------|---------|-------------|
+| `powermesh` | Main intent router (this skill) | `skill("powermesh")` |
+| `powermesh-canvas-app` | Canvas App CREATE/EDIT workflows | `skill("powermesh-canvas-app")` |
+| `powermesh-dataverse` | Dataverse CRUD via PAC CLI + MCP | `skill("powermesh-dataverse")` |
+| `powermesh-pac-cli` | PAC CLI command cheat sheet | `skill("powermesh-pac-cli")` |
+| `powermesh-mcp-bridge` | On-demand credential provisioning | `skill("powermesh-mcp-bridge")` |
+
+Additionally, the installer copies 7 Microsoft-provided plugin skills to `~/.agents/skills/`:
+
+| Skill | Purpose |
+|-------|---------|
+| `canvas-app` | Canvas App coauthoring (Microsoft) |
+| `configure-canvas-mcp` | Canvas MCP setup |
+| `add-data-source` | Add data sources to canvas apps |
+| `genpage` | Model-driven app pages |
+| `create-site` | Power Pages sites |
+| `create-code-app` | Code-first Power Apps |
+| `generate-mcp-app-ui` | MCP widget UI generation |
+
+---
+
+## MCP Servers
+
+| Server | Status | Env Vars Required | Credential Prompt |
+|--------|--------|-------------------|-------------------|
+| `pac-cli` | ✅ Ready | None | Never |
+| `canvas-authoring` | ✅ Ready | None | Never (need Studio tab open) |
+| `powerbi-modeling-mcp` | ✅ Ready | None | Never |
+| `powerplatform-mcp` | ⚠️ Blocked | 4 vars (URL, client ID, secret, tenant ID) | On first use |
+| `dataverse-mcp` | ⚠️ Blocked | 2 vars (connection URL, tenant ID) | On first use |
+| `microsoft-365-mcp` | ⚠️ Blocked | Device code flow | On first use |
+| `powerautomate-mcp` | ⚠️ Blocked | 1 var (Flow Studio API key) | On first use |
+
+### Status details
+
+- **Ready** — Works immediately. `pac-cli` MCP requires only the `pac` CLI to be installed. `canvas-authoring` requires a Power Apps Studio tab open in the browser.
+- **Blocked** — Needs credentials. See [credential provisioning](#credential-provisioning) below. The skill will detect the block, ask for the credential, set it session-only, and retry automatically.
+
+---
+
+## Credential Provisioning
+
+PowerMesh uses **on-demand credential provisioning**: credentials are never pre-configured or stored. When a blocked server is needed:
+
+1. **Detect** — The MCP tool call returns an error indicating a missing environment variable
+2. **Ask** — PowerMesh asks you for the required value, including where to obtain it
+3. **Set** — The value is set as `$env:VAR_NAME = "value"` for the current session only
+4. **Retry** — The tool call is retried and succeeds
+
+### Provisioning matrix
+
+| Server | Prompt | Where to get |
+|--------|--------|-------------|
+| `powerplatform-mcp` | "What's your Dataverse org URL, SPN client ID, client secret, and tenant ID?" | Azure AD app registration |
+| `dataverse-mcp` | "What's your Dataverse org URL and tenant ID?" | Power Platform Admin Center |
+| `microsoft-365-mcp` | "Open https://microsoft.com/devicelogin and enter the code: XXX" | Microsoft 365 admin |
+| `powerautomate-mcp` | "What's your Flow Studio API key?" | https://mcp.flowstudio.app |
+
+---
 
 ## Testing
+
+PowerMesh includes a comprehensive test suite:
 
 ```powershell
 # Run all tests
 ./scripts/test-runner.ps1
 
-# Run specific test
-./scripts/test-runner.ps1 -Test "canvas-app-create"
+# Run a specific test by name
+./scripts/test-runner.ps1 -Test "pac-solution-list"
+
+# List all available tests
+./scripts/test-runner.ps1 -List
 ```
 
-Test definitions are in `tests/test-cases.yaml`. EvalView tests are in `tests/evalview/`.
+### Test categories
 
-## Examples
+- **PAC CLI documentation coverage** (4 tests) — Validates every command referenced in SKILL.md actually exists in the `pac` CLI help output
+- **Credential provisioning flow** (4 tests) — Validates the on-demand credential workflow is documented for each blocked server
+- **Sub-skill routing** (7 tests, non-critical) — Validates intent routing to sub-skills (requires runtime environment to fully execute)
 
-See the `examples/` directory for complete walkthroughs:
+All test results: **8 PASS, 0 FAIL, 7 SKIPPED** (skipped tests need a runtime environment with active MCP servers).
 
-- `canvas-app-inventory.yaml` — Create an inventory tracking canvas app
-- `solution-alm.yaml` — Full ALM lifecycle with PAC CLI
-- `dataverse-crud.yaml` — CRUD operations on Dataverse data
-- `power-pages-deploy.yaml` — Deploy a Power Pages site
+Test definitions: `tests/test-cases.yaml` (25 documented cases)
+EvalView tests: `tests/evalview/` (E2E automation scenarios)
 
-## Credential Provisioning
+---
 
-Servers that need env vars will prompt you on first use:
-
-1. You ask for something (e.g., "list my flows")
-2. PowerMesh detects the required MCP server is blocked
-3. PowerMesh asks you for the credential value
-4. You provide it (session-only, never persisted to disk)
-5. PowerMesh retries and succeeds
-
-This means **zero setup required** to start using PowerMesh.
-
-## File Reference
+## Project Structure
 
 ```
-powermesh/
-├── plugin.yaml                       # Plugin manifest
-├── README.md                         # This file
-├── SKILL.md                          # Main intent router
-├── .gitignore
+power-platform-toolchain/
+├── .gitignore                       # Git ignore rules
+├── LICENSE                          # MIT license
+├── README.md                        # This file
+├── CHANGELOG.md                     # Version history
+├── CONTRIBUTING.md                  # Contribution guide
+│
+├── SKILL.md                         # Main intent router (loaded by skill())
+├── plugin.yaml                      # Plugin manifest (name, deps, hooks)
+├── install.ps1                      # One-command installer
+├── push-to-github.ps1               # GitHub push helper
+│
 ├── shared/
-│   └── shared-instructions.md        # Cross-cutting concerns
+│   └── shared-instructions.md       # Cross-cutting concerns (auth, errors, rate limits)
+│
 ├── skills/
-│   ├── canvas-app/SKILL.md           # Canvas app builder
-│   ├── dataverse/SKILL.md            # Dataverse CRUD
-│   ├── pac-cli/SKILL.md              # PAC CLI automation
-│   └── mcp-bridge/SKILL.md           # Credential provisioning
+│   ├── canvas-app/SKILL.md          # Canvas App CREATE/EDIT builder
+│   ├── dataverse/SKILL.md           # Dataverse CRUD via PAC CLI + MCP
+│   ├── pac-cli/SKILL.md             # PAC CLI cheat sheet (25+ commands)
+│   └── mcp-bridge/SKILL.md          # On-demand credential provisioning
+│
 ├── scripts/
-│   └── test-runner.ps1               # Test runner
+│   └── test-runner.ps1              # Test runner (15 test cases)
+│
 ├── tests/
-│   ├── test-cases.yaml               # All test cases
-│   └── evalview/                     # EvalView E2E tests
-└── examples/
-    └── canvas-app-inventory.yaml     # Example walkthrough
+│   ├── test-cases.yaml              # 25 documented test cases
+│   └── evalview/
+│       └── canvas-app-create.yaml   # E2E test scenario
+│
+├── examples/
+│   └── canvas-app-inventory.yaml    # Full session walkthrough
+│
+└── docs/
+    ├── ARCHITECTURE.md              # Detailed architecture
+    └── CREDENTIAL_PROVISIONING.md   # Full provisioning guide
 ```
+
+---
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+**Quick start for contributors:**
+
+```powershell
+git clone https://github.com/shouryavarma/power-platform-toolchain.git
+cd power-platform-toolchain
+.\install.ps1        # local reinstall
+.\scripts\test-runner.ps1   # verify
+```
+
+---
+
+## License
+
+[MIT](LICENSE) — Free to use, modify, and distribute.
