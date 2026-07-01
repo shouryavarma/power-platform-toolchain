@@ -1,0 +1,32 @@
+name: powermesh
+version: 1.0.0
+displayName: PowerMesh — Unified Power Platform Toolchain
+description: >
+  Natural language interface for all Microsoft Power Platform tools.
+  Routes intent to the right MCP server, plugin skill, or agent automatically.
+author: User
+icon: null
+license: MIT
+tags: [power-platform, power-apps, power-pages, dataverse, pac-cli, mcp, microsoft]
+dependencies:
+  mcp-servers:
+    - pac-cli
+    - canvas-authoring
+    - powerbi-modeling-mcp
+    - powerplatform-mcp
+    - dataverse-mcp
+    - microsoft-365-mcp
+    - powerautomate-mcp
+  skills:
+    - canvas-app
+    - configure-canvas-mcp
+    - add-data-source
+    - genpage
+    - create-site
+    - create-code-app
+    - generate-mcp-app-ui
+onLoad:
+  - verify-power-platform-mcp-registration:
+      check: "pac help" via pac-cli MCP
+  - check-credentials:
+      prompt-missing-for: [powerplatform-mcp, dataverse-mcp, powerautomate-mcp]

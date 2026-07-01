@@ -1,0 +1,41 @@
+name: powermesh-canvas-app-create
+description: >
+  Full E2E: user asks to create a canvas app → intent routed to canvas-app skill →
+  clarifying questions asked → .pa.yaml files written → compile_canvas → sync_canvas.
+
+steps:
+  - step: 1
+    action: user-prompt
+    input: "create a canvas app for inventory tracking with 3 screens: dashboard, add item, view all"
+    expect-skill: canvas-app
+
+  - step: 2
+    action: agent-clarifies
+    expect-questions:
+      - "What data source?"
+      - "What columns?"
+      - "Any approvals?"
+    output: >
+      User confirms: SharePoint list "InventoryItems" with columns:
+      Name, SKU, Quantity, Location, LastUpdated. No approvals needed.
+
+  - step: 3
+    action: agent-writes-yaml
+    expect-files:
+      - dashboard.pa.yaml
+      - add-item.pa.yaml
+      - view-all.pa.yaml
+    validate:
+      - dashboard.pa.yaml contains "Gallery" control bound to InventoryItems
+      - add-item.pa.yaml contains "Form" control
+      - view-all.pa.yaml contains "DataTable" control
+
+  - step: 4
+    action: compile_canvas
+    expect: success
+    on-error: fix errors and retry up to 3 times
+
+  - step: 5
+    action: sync_canvas
+    expect: success
+    output: "App synced to Power Apps Studio"

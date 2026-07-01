@@ -1,0 +1,44 @@
+# Example: Create an Inventory Tracking Canvas App
+# This walks through a complete PowerMesh session.
+
+## User Prompt
+# "Create a canvas app for inventory tracking with dashboard, add item, and view all screens."
+
+## PowerMesh Execution Trace
+
+### Step 1: Intent Recognition
+# Input matched: canvas-app skill
+# Mode: CREATE (keyword "create" detected)
+# Skill loaded: powermesh-canvas-app
+
+### Step 2: Requirements Discovery
+# Agent asks:
+#   Q: "What data source? (SharePoint, SQL, Dataverse, Excel?)"
+#   A: "SharePoint list 'InventoryItems'"
+#   Q: "What columns?"
+#   A: "Name, SKU, Quantity, Location, LastUpdated"
+#   Q: "Any approval workflow?"
+#   A: "No"
+
+### Step 3: Screen Plan
+# Screens:
+#   1. Dashboard — Gallery showing all items, search bar, summary stats
+#   2. Add Item — Form with fields, submit button
+#   3. View All — DataTable with sort/filter, edit/delete actions
+
+### Step 4: YAML Generation (parallel)
+# Agent spawns 3 sub-agents, one per screen.
+# Each writes a .pa.yaml file:
+#   - screens/dashboard.pa.yaml
+#   - screens/add-item.pa.yaml
+#   - screens/view-all.pa.yaml
+
+### Step 5: Compile
+# compile_canvas → 0 errors ✓
+
+### Step 6: Sync
+# sync_canvas → "App synced to Power Apps Studio" ✓
+
+## Result
+# Canvas app "Inventory Tracker" is now open in Power Apps Studio
+# with 3 screens connected to the SharePoint list.

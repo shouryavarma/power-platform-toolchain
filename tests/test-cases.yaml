@@ -1,0 +1,277 @@
+# PowerMesh Test Cases — YAML format for both human review and CI parsing.
+# Each test case defines:
+#   - id: unique identifier
+#   - name: human-readable name
+#   - description: what this test validates
+#   - input: the user prompt
+#   - expectedSkill: which skill should be loaded (optional)
+#   - expectedMCP: which MCP server should be used (optional)
+#   - expectedCommand: the PAC CLI command (optional)
+#   - expectedFlow: "credential-provisioning" if credentials are needed (optional)
+#   - requires: runtime dependencies needed
+#   - critical: if true, this must pass before release
+
+tests:
+  - id: TC-001
+    name: canvas-app-create
+    description: >
+      When user requests a new canvas app, the intent router should
+      identify this as a canvas-app skill task. The sub-agent should
+      ask clarifying questions, plan screens, and produce .pa.yaml.
+    input: "create a canvas app for inventory tracking with 3 screens"
+    expectedSkill: canvas-app
+    expectedMCP: canvas-authoring
+    requires: [canvas-authoring, power-apps-studio]
+    critical: false
+
+  - id: TC-002
+    name: canvas-app-edit
+    description: >
+      When user requests editing an existing canvas app, the router
+      should detect EDIT mode (no "create" keyword) and follow the
+      clone→edit→compile→sync workflow.
+    input: "add a new screen to my expense report app"
+    expectedSkill: canvas-app
+    expectedMCP: canvas-authoring
+    requires: [canvas-authoring, power-apps-studio]
+    critical: false
+
+  - id: TC-003
+    name: pac-solution-list
+    description: >
+      When user asks to list solutions, the router should call
+      `pac solution list` via the pac-cli MCP server.
+    input: "list all solutions in my environment"
+    expectedMCP: pac-cli
+    expectedCommand: pac solution list
+    requires: [pac-cli, power-platform-auth]
+    critical: true
+
+  - id: TC-004
+    name: pac-solution-export
+    description: >
+      Export a named solution. The router should construct
+      `pac solution export --name <name>` with appropriate flags.
+    input: "export the Contoso solution as managed"
+    expectedMCP: pac-cli
+    expectedCommand: pac solution export
+    requires: [pac-cli, power-platform-auth]
+    critical: true
+
+  - id: TC-005
+    name: pac-solution-import
+    description: >
+      Import a solution from a file path. The router should construct
+      `pac solution import --file <path>`.
+    input: "import the solution from ./solutions/MySolution.zip"
+    expectedMCP: pac-cli
+    expectedCommand: pac solution import
+    requires: [pac-cli, power-platform-auth]
+    critical: true
+
+  - id: TC-006
+    name: pac-solution-clone
+    description: >
+      Clone a solution for source control integration.
+      `pac solution clone --name <name> --output <path>`.
+    input: "clone the Contoso solution to src/solutions/"
+    expectedMCP: pac-cli
+    expectedCommand: pac solution clone
+    requires: [pac-cli, power-platform-auth]
+    critical: true
+
+  - id: TC-007
+    name: pac-env-who
+    description: >
+      Identify current environment and auth context.
+      `pac env who` returns the connected org URL and user.
+    input: "what environment am I connected to?"
+    expectedMCP: pac-cli
+    expectedCommand: pac env who
+    requires: [pac-cli]
+    critical: true
+
+  - id: TC-008
+    name: pac-data-list
+    description: >
+      List records from a Dataverse table using PAC CLI.
+      `pac data list --table <name>`.
+    input: "show me all accounts"
+    expectedMCP: pac-cli
+    expectedCommand: pac data list
+    requires: [pac-cli, power-platform-auth]
+    critical: true
+
+  - id: TC-009
+    name: pac-data-create
+    description: >
+      Create a record in a Dataverse table.
+      `pac data create --table <name> --json <data>`.
+    input: "create a new contact named John Doe"
+    expectedMCP: pac-cli
+    expectedCommand: pac data create
+    requires: [pac-cli, power-platform-auth]
+    critical: true
+
+  - id: TC-010
+    name: dataverse-credential-prompt
+    description: >
+      When dataverse-mcp is needed but DATAVERSE_CONNECTION_URL is not set,
+      the MCP bridge should prompt the user for the URL and tenant ID,
+      set the env vars session-only, and retry.
+    input: "create a record in the contact table"
+    expectedMCP: dataverse-mcp
+    expectedFlow: credential-provisioning
+    requires: [mcp-bridge]
+    critical: true
+
+  - id: TC-011
+    name: powerautomate-credential-prompt
+    description: >
+      When powerautomate-mcp is needed but FLOWSTUDIO_API_KEY is not set,
+      the bridge should prompt for the API key (with source URL),
+      set the env var, and retry.
+    input: "list my power automate flows"
+    expectedMCP: powerautomate-mcp
+    expectedFlow: credential-provisioning
+    requires: [mcp-bridge]
+    critical: true
+
+  - id: TC-012
+    name: m365-credential-prompt
+    description: >
+      When microsoft-365-mcp is needed but no auth token exists,
+      the bridge should guide the user through device code auth flow.
+    input: "send an email via graph api"
+    expectedMCP: microsoft-365-mcp
+    expectedFlow: credential-provisioning
+    requires: [mcp-bridge]
+    critical: true
+
+  - id: TC-013
+    name: powerplatform-mcp-credential-prompt
+    description: >
+      When powerplatform-mcp is needed but POWERPLATFORM_DEV_* vars are missing,
+      the bridge should prompt for org URL + SPN credentials.
+    input: "register a plugin assembly"
+    expectedMCP: powerplatform-mcp
+    expectedFlow: credential-provisioning
+    requires: [mcp-bridge]
+    critical: true
+
+  - id: TC-014
+    name: genpage-model-app
+    description: >
+      When user requests a model-driven app page, route to genpage skill.
+      The skill orchestrates planning → entity creation → code generation.
+    input: "create a generative page for the opportunity table"
+    expectedSkill: genpage
+    requires: [genpage, pac-cli]
+    critical: false
+
+  - id: TC-015
+    name: create-site-power-pages
+    description: >
+      When user requests a Power Pages site, route to create-site skill.
+      The skill scaffolds a React/Angular/Vue SPA.
+    input: "create a power pages site for a customer portal"
+    expectedSkill: create-site
+    requires: [create-site, power-platform-auth]
+    critical: false
+
+  - id: TC-016
+    name: create-code-app
+    description: >
+      When user requests a code-first Power App, route to create-code-app skill.
+      The skill scaffolds a React+Vite project with Power Platform integration.
+    input: "scaffold a code-first power app with dataverse integration"
+    expectedSkill: create-code-app
+    requires: [create-code-app, pac-cli]
+    critical: false
+
+  - id: TC-017
+    name: generate-mcp-app-ui
+    description: >
+      When user requests an MCP app UI widget, route to generate-mcp-app-ui skill.
+      The skill generates a self-contained HTML widget for the tool output.
+    input: "create an MCP widget to display flow run status"
+    expectedSkill: generate-mcp-app-ui
+    requires: [generate-mcp-app-ui]
+    critical: false
+
+  - id: TC-018
+    name: powerbi-modeling
+    description: >
+      When user requests semantic model changes, route to powerbi-modeling-mcp.
+    input: "add a calculated column for full name to my model"
+    expectedMCP: powerbi-modeling-mcp
+    requires: [powerbi-modeling-mcp]
+    critical: false
+
+  - id: TC-019
+    name: credential-provisioning-workflow
+    description: >
+      The MCP bridge correctly detects a missing env var error message,
+      prompts with the right question (including where to get the value),
+      sets the env var on confirmation, and retries the original call.
+    input: "simulated error: 'FLOWSTUDIO_API_KEY is not set'"
+    expectedFlow: credential-provisioning
+    requires: [mcp-bridge]
+    critical: true
+
+  - id: TC-020
+    name: canvas-app-add-datasource
+    description: >
+      When user requests adding a data source to a canvas app,
+      route to add-data-source skill.
+    input: "add a SharePoint list as a data source to my canvas app"
+    expectedSkill: add-data-source
+    requires: [add-data-source, canvas-authoring]
+    critical: false
+
+  - id: TC-021
+    name: pac-admin-list-environments
+    description: >
+      List all environments in the tenant via PAC CLI admin commands.
+    input: "list all environments in my tenant"
+    expectedCommand: pac admin list
+    requires: [pac-cli, power-platform-admin]
+    critical: false
+
+  - id: TC-022
+    name: pac-auth-create
+    description: >
+      Authenticate to a Power Platform environment via PAC CLI.
+    input: "login to contoso.crm.dynamics.com"
+    expectedCommand: pac auth create
+    requires: [pac-cli]
+    critical: true
+
+  - id: TC-023
+    name: deploy-power-pages-site
+    description: >
+      When user requests deployment of a Power Pages site,
+      route to deploy-site skill.
+    input: "deploy my customer portal site to production"
+    expectedSkill: deploy-site
+    requires: [deploy-site, power-platform-auth]
+    critical: false
+
+  - id: TC-024
+    name: pac-plugin-list
+    description: >
+      List registered plugin assemblies in the environment.
+    input: "show me all registered plugins"
+    expectedCommand: pac plugin list
+    requires: [pac-cli, power-platform-auth]
+    critical: true
+
+  - id: TC-025
+    name: power-pages-security-scan
+    description: >
+      When user requests a security scan on a Power Pages site,
+      route to scan-site or audit-permissions skill.
+    input: "scan my power pages site for security issues"
+    expectedSkill: scan-site
+    requires: [scan-site]
+    critical: false
