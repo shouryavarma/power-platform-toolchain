@@ -1,0 +1,45 @@
+{
+  "name": "@shouryavarma/powermesh",
+  "version": "1.0.0",
+  "description": "Natural language interface for the Microsoft Power Platform — Canvas Apps, Dataverse, PAC CLI, and more",
+  "keywords": [
+    "power-platform",
+    "power-apps",
+    "dataverse",
+    "microsoft",
+    "canvas-app",
+    "claude-code",
+    "mcp"
+  ],
+  "homepage": "https://github.com/shouryavarma/power-platform-toolchain",
+  "bugs": "https://github.com/shouryavarma/power-platform-toolchain/issues",
+  "license": "MIT",
+  "author": "Shourya Varma",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shouryavarma/power-platform-toolchain.git"
+  },
+  "bin": {
+    "powermesh": "bin/powermesh.js"
+  },
+  "files": [
+    "bin/",
+    "install.ps1",
+    "scripts/",
+    "shared/",
+    "skills/",
+    "tests/",
+    "docs/",
+    "assets/",
+    "examples/",
+    "plugin.yaml",
+    "SKILL.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "win32"
+  ],
+  "preferGlobal": false
+}

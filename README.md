@@ -101,14 +101,29 @@ This will:
 3. Run the test suite to verify everything works
 4. Print a summary
 
-### Manual install
+### npm (via GitHub Release)
+
+```bash
+# Install globally from GitHub Release
+npm install -g https://github.com/shouryavarma/power-platform-toolchain/releases/download/v1.0.0/shouryavarma-powermesh-1.0.0.tgz
+```
+
+Once installed globally:
+```bash
+powermesh status    # check installation
+powermesh test      # run verification tests
+powermesh help      # show help
+```
+
+> The release tarball is attached to every GitHub release. See
+> [Releases](https://github.com/shouryavarma/power-platform-toolchain/releases)
+> for other versions.
+
+### Clone and install
 
 ```powershell
-# Clone the repo
 git clone https://github.com/shouryavarma/power-platform-toolchain.git
 cd power-platform-toolchain
-
-# Run the installer
 .\install.ps1
 ```
 
