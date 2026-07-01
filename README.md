@@ -4,7 +4,7 @@
 </picture>
 
 <p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square" alt="Version"></a>
+  <a href="https://github.com/shouryavarma/power-platform-toolchain/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square" alt="Version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License"></a>
   <a href="#"><img src="https://img.shields.io/badge/tests-8%2F8%20PASS-brightgreen?style=flat-square" alt="Tests"></a>
   <a href="#"><img src="https://img.shields.io/badge/powershell-5.1%2B-blue?style=flat-square" alt="PowerShell"></a>
